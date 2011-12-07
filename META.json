@@ -28,10 +28,12 @@
       "runtime" : {
          "requires" : {
             "Carp" : 0,
+            "Data::Dumper" : 0,
             "IO::Socket::INET" : 0,
             "Moose" : 0,
             "Moose::Role" : 0,
             "Scalar::Util" : 0,
+            "aliased" : 0,
             "namespace::sweep" : "0.003",
             "overload" : 0,
             "utf8" : 0
@@ -39,7 +41,6 @@
       },
       "test" : {
          "requires" : {
-            "Data::Dumper" : 0,
             "Encode" : 0,
             "Test::More" : 0,
             "strict" : 0,
@@ -55,6 +56,6 @@
          "web" : "http://github.com/friedo/perl-redis-client"
       }
    },
-   "version" : "0.002"
+   "version" : "0.009"
 }
 

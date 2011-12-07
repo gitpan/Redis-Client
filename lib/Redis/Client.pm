@@ -1,6 +1,6 @@
 package Redis::Client;
 {
-  $Redis::Client::VERSION = '0.002';
+  $Redis::Client::VERSION = '0.009';
 }
 
 use Moose;
@@ -13,50 +13,140 @@ use namespace::sweep 0.003;
 
 has 'host'         => ( is => 'ro', isa => 'Str', default => 'localhost' );
 has 'port'         => ( is => 'ro', isa => 'Int', default => 6379 );
-has '_sock'        => ( is => 'ro', isa => 'IO::Socket', init_arg => undef, lazy_build => 1 );
+has 'pass'         => ( is => 'ro', isa => 'Maybe[Str]', default => undef );
+
+with 'Redis::Client::Role::URP';
 
 BEGIN { 
-    # maps Redis commands to arity. undef = variadic.
+    # maps Redis commands to arity; undef implies variadic
     my %COMMANDS = 
-      ( ECHO        => 1,
-        TYPE        => 1,
-
-        SET         => 2,
+      ( # key commands
         DEL         => undef,
+        EXISTS      => 1,
+        EXPIRE      => 2,
+        EXPITEAT    => 2,
+        KEYS        => 1,
+        MOVE        => 2,
+        OBJECT      => undef,
+        PERSIST     => 1,
+        RANDOMKEY   => 0,
+        RENAME      => 2,
+        RENAMENX    => 2,
+        SORT        => undef,
+        TTL         => 1,
+        TYPE        => 1,
+        EVAL        => undef,
+       
+        # string commands
+        APPEND      => 2,
+        DECR        => 1,
+        DECRBY      => 2, 
         GET         => 1,
+        GETBIT      => 2,
+        GETRANGE    => 3,
+        GETSET      => 2,
+        INCR        => 1,
+        INCRBY      => 2,
+        MGET        => undef,
+        MSET        => undef,
+        MSETNX      => undef,
+        SET         => 2,
+        SETBIT      => 3,
+        SETEX       => 3,
+        SETNX       => 2,
+        SETRANGE    => 3,
+        STRLEN      => 1,
 
+        # list commands
+        BLPOP       => undef,
+        BRPOP       => undef,
+        BRPOPLPUSH  => 3,
         LINDEX      => 2,
-        LSET        => 3,
+        LINSERT     => 4,
         LLEN        => 1,
-        LTRIM       => 3,
-        RPUSH       => undef,
-        RPOP        => 1,
-        LPUSH       => undef,
         LPOP        => 1,
+        LPUSH       => undef,
+        LPUSHX      => 2,
+        LRANGE      => 3,
+        LREM        => 3,
+        LSET        => 3,
+        LTRIM       => 3,
+        RPOP        => 1,
+        RPOPLPUSH   => 2,
+        RPUSH       => undef,
+        RPUSHX      => 2,
 
-        HGET        => 2,
-        HSET        => 3,
+        # hash commands
         HDEL        => undef,
         HEXISTS     => 2,
+        HGET        => 2,
         HGETALL     => 1,
+        HINCRBY     => 3,
         HKEYS       => 1,
-        HVALS       => 1,
         HLEN        => 1,
         HMGET       => undef,
         HMSET       => undef,
+        HSET        => 3,
+        HSETNX      => 3,
+        HVALS       => 1,
 
+        # set commands
         SADD        => undef,
-        SREM        => undef,
-        SMEMBERS    => 1,
+        SCARD       => 1,
+        SDIFF       => undef,
+        SDIFFSTORE  => undef,
+        SINTER      => undef,
+        SINTERSTORE => undef,
         SISMEMBER   => 2,
+        SMEMBERS    => 1,
+        SMOVE       => 3,
+        SPOP        => 1,
+        SRANDMEMBER => 1,
+        SREM        => undef,
+        SUNION      => undef,
+        SUNIONSTORE => undef,
 
+        # zset commands
         ZADD        => undef,
         ZCARD       => 1,
         ZCOUNT      => 3,
+        ZINCRBY     => 3,
+        ZINTERSTORE => undef,
         ZRANGE      => undef,
+        ZRANGEBYSCORE => undef,
         ZRANK       => 2,
         ZREM        => undef,
+        ZREMRANGEBYRANK => 3,
+        ZREMRANGEBYSCORE => undef,
+        ZREVRANK    => 2,
         ZSCORE      => 2,
+        ZUNIONSTORE => undef,
+
+        # connection commands
+        AUTH        => 1,
+        ECHO        => 1,
+        PING        => 0,
+        QUIT        => 0,
+        SELECT      => 1,
+
+        # server commands
+        BGREWRITEAOF => 0,
+        BGSAVE      => 0,
+        'CONFIG GET' => 1,
+        'CONFIG SET' => 2,
+        'CONFIG RESETSTAT' => 0,
+        DBSIZE      => 0,
+        'DEBUG OBJECT' => 1,
+        'DEBUG SEGFAULT' => 0,
+        FLUSHALL    => 0,
+        FLUSHDB     => 0,
+        INFO        => 0,
+        LASTSAVE    => 0,
+        SAVE        => 0,
+        SHUTDOWN    => 0,
+        SLAVEOF     => 2,
+        SLOWLOG     => undef,
+        SYNC        => 0,
       );
 
     foreach my $cmd ( keys %COMMANDS ) { 
@@ -64,19 +154,22 @@ BEGIN {
             my $self = shift;
             my @args = @_;
 
-            if ( my $args_num = $COMMANDS{$cmd} ) { 
+            my $args_num = $COMMANDS{$cmd};
+            if ( defined $args_num ) { 
                 croak sprintf( 'Redis %s command requires %s arguments', $cmd, $args_num )
                   unless @args == $args_num;
             }
 
-            return $self->_send_command( $cmd, @args );
+            return $self->send_command( $cmd, @args );
         };
 
-        __PACKAGE__->meta->add_method( lc $cmd, $meth );
+        # some commands have spaces in them. yeesh.
+        my $meth_name = lc $cmd;
+        $meth_name =~ s/\s/_/g;
+
+        __PACKAGE__->meta->add_method( $meth_name => $meth );
     }
 };
-
-my $CRLF = "\x0D\x0A";
 
 
 foreach my $func( 'lpush', 'rpush' ) { 
@@ -91,128 +184,12 @@ foreach my $func( 'lpush', 'rpush' ) {
     };
 }
 
-
-sub _build__sock { 
+# don't try to send commands on disconnected socket
+after quit => sub { 
     my $self = shift;
+    $self->_clear_sock;
+};
 
-    my $sock = IO::Socket::INET->new( 
-        PeerAddr    => $self->host,
-        PeerPort    => $self->port,
-        Proto       => 'tcp',
-    ) or die sprintf q{Can't connect to Redis host at %s:%s: %s}, $self->host, $self->port, $@;
-
-    return $sock;
-}
-
-sub _send_command { 
-    my $self = shift;
-    my ( $cmd, @args ) = @_;
-
-    my $sock = $self->_sock;
-    my $cmd_block = $self->_build_urp( $cmd, @args );
-
-    $sock->send( $cmd_block );
-
-    return $self->_get_response;
-}
-
-# build a command string using the binary-safe Unified Request Protocol
-sub _build_urp { 
-    my $self = shift;
-    my @items = @_;
-
-    my $length = @_;
-
-    my $block = sprintf '*%s%s', $length, $CRLF;
-
-    foreach my $line( @items ) { 
-        $block .= sprintf '$%s%s', length $line, $CRLF;
-        $block .= $line . $CRLF;
-    }
-
-    return $block;
-}
-
-sub _get_response { 
-    my $self = shift;
-    my $sock = $self->_sock;
-
-    # the first byte tells us what to expect
-    my %msg_types = ( '+'   => '_read_single_line',
-                      '-'   => '_read_single_line',
-                      ':'   => '_read_single_line',
-                      '$'   => '_read_bulk_reply',
-                      '*'   => '_read_multi_bulk_reply' );
-
-    my $buf;
-    $sock->read( $buf, 1 );
-    die "Can't read from socket" unless $buf;
-    die "Can't understand Redis message type [$buf]" unless exists $msg_types{$buf};
-
-    my $meth = $msg_types{$buf};
-
-    if ( $buf eq '-' ) { 
-        # A Redis error. Get the error message and throw it.
-        my $err = $self->$meth;
-        $err =~ s/ERR\s/Redis: /;
-        croak $err;
-    }
-
-    # otherwise get the response and return it normally.
-    return $self->$meth;
-}
-
-sub _read_multi_bulk_reply { 
-    my $self = shift;
-    my $sock = $self->_sock;
-
-    local $/ = $CRLF;
-
-    my $parts = readline $sock;
-    chomp $parts;
-
-    return if $parts == 0;      # null response
-
-    my @results;
-    foreach my $part ( 1 .. $parts ) { 
-        # better hope we don't see a multi-bulk inside a multi-bulk!
-        push @results, $self->_get_response;
-    }
-
-    return @results;
-}
-
-sub _read_bulk_reply { 
-    my $self = shift;
-    my $sock = $self->_sock;
-
-    local $/ = $CRLF;
-
-    my $length = readline $sock;
-    chomp $length;
-
-    return if $length == -1;    # null response
-
-    my $buf;
-    $sock->read( $buf, $length );
-
-    # throw out the terminating CRLF
-    readline $sock;
-
-    return $buf;
-}
-
-sub _read_single_line { 
-    my $self = shift;
-    my $sock = $self->_sock;
-
-    local $/ = $CRLF;
-
-    my $val = readline $sock;
-    chomp $val;
-
-    return $val;
-}
 
 
 __PACKAGE__->meta->make_immutable;
@@ -229,7 +206,7 @@ Redis::Client - Perl client for Redis 2.4 and up
 
 =head1 VERSION
 
-version 0.002
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -269,19 +246,38 @@ usage:
 
 =over
 
-=item L<Redis::Client::String>
+=item * L<Redis::Client::String>
 
-=item L<Redis::Client::List>
+=item * L<Redis::Client::List>
 
-=item L<Redis::Client::Hash>
+=item * L<Redis::Client::Hash>
 
-=item L<Redis::Client::Set>
+=item * L<Redis::Client::Set>
 
-=item L<Redis::Client::Zset>
+=item * L<Redis::Client::Zset>
 
 =back
 
-=head1 METHODS
+=head1 INSTALLATION
+
+Redis::Client can be installed the usual way via CPAN. In order to run the test suite, Redis::Client
+needs to know about a Redis server that it can talk to. Make sure to set the following environment
+variables prior to installing this distribution or running the test suite.
+
+=over
+
+=item * C<PERL_REDIS_TEST_SERVER> - the hostname of the Redis server (default localhost).
+
+=item * C<PERL_REDIS_TEST_PORT> - the port number of the Redis server (default 6379).
+
+=item * C<PERL_REDIS_TEST_PASSWORD> - (optional) the Redis server password (default C<undef>).
+
+=back
+
+All keys generated by the test suite will have the prefix C<perl_redis_test>. Unless something 
+goes wrong, they'll all be deleted when each test is completed.
+
+=head1 CLASS METHODS
 
 =head2 new
 
@@ -304,19 +300,30 @@ Redis connection passwords are not currently supported.
 
     my $client = Redis::Client->new( host => 'foo.example.com', port => 1234 );
 
+=head1 KEY METHODS
+
 =head2 del
+
+Redis L<DEL|http://redis.io/commands/del> command.
 
 Deletes keys. Takes a list of key names. Returns the number of keys deleted.
 
     $client->del( 'foo', 'bar', 'baz' );
 
-=head2 echo
+=head2 type
 
-Returns whatever you send it. Useful for testing only. Takes one argument.
+Redis L<TYPE|http://redis.io/commands/type> command.
 
-    print $client->echo( "Hello, World!" );
+Retrieves the type of a key. Takes the key name and returns one of C<string>, C<list>, 
+C<hash>, C<set>, or C<zset>.
+
+    my $type = $client->type( 'some_key' );
+
+=head1 STRING METHODS
 
 =head2 get
+
+Redis L<GET|http://redis.io/commands/get> command.
 
 Retrieves a string value associated with a key. Takes one key name. Returns C<undef> if the
 key does not exist. If the key is associated with something other than a string,
@@ -324,7 +331,284 @@ a fatal error is thrown.
 
     print $client->get( 'mykey' );
 
+=head2 append
+
+Redis L<APPEND|http://redis.io/commands/append> command.
+
+Appends a value to the end of a string. Takes the key name and a value to append.
+Returns the new length of the string. If the key is not a string, a fatal error
+is thrown.
+
+    my $new_length = $client->append( mykey => 'foobar' );
+
+=head2 decr
+
+Redis L<DECR|http://redis.io/commands/decr> command.
+
+Decrements a number stored in a string. Takes the key name and returns the decremented
+value. If the key does not exist, zero is assumed and decremented to -1. If the key
+is not a string, a fatal error is thrown.
+
+    my $new_val = $client->decr( 'my_num' );
+
+=head2 decrby
+
+Redis L<DECRBY|http://redis.io/commands/decrby> command.
+
+Decrements a number stored in a string by a certain amount. Takes the key name and
+the amount by which to decrement. Returns the new value. If the key is not a string,
+a fatal error is thrown.
+
+    my $new_val = $client->decrby( 'my_num', 3 );
+
+=head2 get
+
+Redis L<GET|http://redis.io/commands/get> command.
+
+Returns the value of a string. Takes the key name. If the key is not a string, a
+fatal error is thrown.
+
+    my $val = $client->get( 'my_key' );
+
+=head2 getrange
+
+Redis L<GETRANGE|http://redis.io/commands/getrange> command.
+
+Returns a substring of a string, specified by a range. Takes the key name and
+the start and end offset of the range. Negative numbers count from the end.
+If the key is not a string, a fatal error is thrown.
+
+    my $substr = $client->getrange( 'my_key', 3, 5 );
+    my $substr = $client->getrange( 'my_key', -5, -1 );  # last five 
+
+=head2 getset
+
+Redis L<GETSET|http://redis.io/commands/getset> command.
+
+Sets the value of a string and returns the old value atomically. Takes the
+key name and the new value. If the key is not a string, a fatal error is
+thrown. If the key does not exist, it is created and C<undef> is returned.
+
+    my $old_val = $client->getset( my_key => 'new value' );
+
+=head2 incr
+
+Redis L<INCR|http://redis.io/commands/incr> command.
+
+Increments a number stored in a string. Takes the key name and returns the incremented
+value. If the key does not exist, zero is assumed and incremented to 1. If the key
+is not a string, a fatal error is thrown.
+
+    my $new_val = $client->incr( 'my_num' );
+
+=head2 incrby
+
+Redis L<INCRBY|http://redis.io/commands/incrby> command.
+
+Increments a number stored in a string by a certain amount. Takes the key name and
+the amount by which to increment. Returns the new value. If the key is not a string,
+a fatal error is thrown.
+
+    my $new_val = $client->incrby( 'my_num', 3 );
+
+=head2 mget
+
+Redis L<MGET|http://redis.io/commands/mget> command.
+
+Gets the values of multiple strings. Takes the list of key names to get. If a
+key does not exist or if it is not a string, C<undef> will be returned in its
+place.
+
+    my @vals = $client->mget( 'foo', 'bar', baz' );
+    print $vals[2];    # value of baz
+
+=head2 mset
+
+Redis L<MSET|http://redis.io/commands/mset> command.
+
+Sets the values of multiple strings. Takes a list of key/value pairs to set.
+If a key does not exist, it will be created. If a key is not a string, it will
+be silently converted to one. Therefore, use with caution.
+
+    $client->mset( foo => 1, bar => 2, baz => 3 );
+
+=head2 msetnx
+
+Redis L<MSETNX|http://redis.io/commands/msetnx> command.
+
+Atomically sets the values of multiple strings, only if I<none> of the keys yet exist.
+Returns 1 on success, 0 otherwise. 
+
+    my $it_worked = $client->msetnx( foo => 1, bar => 2, baz => 3 );
+
+=head2 set
+
+Redis L<SET|http://redis.io/commands/set> command.
+
+Sets the value of a string. Takes the key name and a value. 
+
+    $client->set( my_key => 'foobar' );
+
+=head2 setbit
+
+Redis L<SETBIT|http://redis.io/commands/setbit> command.
+
+Sets the value of one bit in a string. Takes the key name, offset of the bit, and
+new value. Returns the original value of the bit. If the key is not a string or
+if the bit value is not 0 or 1, a fatal error is thrown.
+
+    my $old_bit = $client->setbit( 'my_key', 3, 1 );
+
+=head2 setex
+
+Redis L<SETEX|http://redis.io/commands/setex> command.
+
+Sets the value of a string and its expiration time in seconds. Takes the key name,
+the expiration time, and the value. 
+
+    $client->setex( 'my_key', 5, 'foo' );   # goes bye-bye in 5 secs.
+
+=head2 setnx
+
+Redis L<SETNX|http://redis.io/commands/setnx> command.
+
+Sets the value of a string, only if it I<does not> yet exist. Takes the key name
+and value. Returns 1 on success, 0 otherwise.
+
+    my $key_was_set = $client->setnx( my_key => 'foobar' ); 
+
+=head2 setrange
+
+Redis L<SETRANGE|http://redis.io/commands/setrange> command.
+
+Sets the value of a substring of a string. Takes the key name, the offset, and 
+a replacement string. Returns the length of the modified string. If the key
+is not a string, a fatal error is thrown.
+
+    $client->set( my_key => "I'm a teapot." );
+    my $new_length = $client->setrange( 'my_key', 6, 'foobar' ); # I'm a foobar.
+
+=head2 strlen
+
+Redis L<STRLEN|http://redis.io/commands/strlen> command.
+
+Returns the length of a string. Takes the key name. If the key is not a string, 
+a fatal error is thrown.
+
+    my $length = $client->strlength( 'my_key' );
+
+=head1 LIST METHODS
+
+=head2 blpop
+
+Redis L<BLPOP|http://redis.io/commands/blpop> command.
+
+Blocking left list pop. Takes a list of keys to poll and a timeout in seconds. Returns
+a two-element list containing the name of the list and the popped value on 
+success, C<undef> otherwise. Returns immediately if a value is waiting on any 
+of the specified lists, otherwise waits for a value to appear or the timeout
+to expire. A timeout of zero waits forever. 
+
+    my ( $list, $value ) = $client->blpop( 'list1', 'list2', 5 ); # wait 5 secs
+
+See L<lpop> for the non-blocking version.
+
+=head2 brpop
+
+Redis L<BRPOP|http://redis.io/commands/brpop> command.
+
+Blocking right list pop. Takes a list of keys to poll and a timeout in seconds. Returns
+a two-element list containing the name of the list and the popped value on 
+success, C<undef> otherwise. Returns immediately if a value is waiting on any
+of the specified lists, otherwise waits for a value to appear or the timeout
+to expire. A timeout of zero waits forever.
+
+    my ( $list, $value ) = $client->brpop( 'list1', 'list2', 5 ); # wait 5 secs
+
+See L<rpop> for the non-blocking version.
+
+=head2 lindex
+
+Redis L<LINDEX|http://redis.io/commands/lindex> command.
+
+Retrieves the value stored at a particular index in a list. Takes the list name
+and the numeric index. 
+
+    my $val = $client->lindex( 'my_list', 42 );
+
+=head2 lset
+
+Redis L<LSET|http://redis.io/commands/lset> command.
+
+Sets the value at a particular index in a list. Takes the list name, the numeric
+index, and the new value.
+
+    $client->lset( 'my_list', 42, 'yippee!' );
+
+=head2 llen
+
+Redis L<LLEN|http://redis.io/commands/llen> command.
+
+Retrieves the number of items in a list. Takes the list name.
+
+    my $length = $client->llen( 'my_list' );
+
+=head2 ltrim
+
+Redis L<LTRIM|http://redis.io/commands/ltrim> command.
+
+Removes all elements of a list outside of the specified range. Takes the list 
+name, start index, and stop index. All keys between the start and stop indices
+(inclusive) will be preserved. The rest will be deleted. The list is shifted down
+if the start index is not zero. The stop index C<-1> can be used to select everything
+until the end of the list.
+
+    # get rid of first two elements.
+    $client->ltrim( 'my_list', 2, -1 );
+
+=head2 rpush
+
+Redis L<RPUSH|http://redis.io/commands/rpush> command.
+
+Adds items to the end of a list, analogous to the Perl C<push> operator. Takes 
+the list name and a list of items to add. Returns the length of the list when
+done.
+
+    my $new_length = $client->rpush( my_list => 42, 43, 'narf', 'poit' );
+
+=head2 rpop
+
+Redis L<RPOP|http://redis.io/commands/rpop> command.
+
+Removes and returns the last element of a list, analogous to the Perl C<pop>
+operator. 
+
+    my $last = $client->rpop( 'my_list' );
+
+=head2 lpush
+
+Redis L<LPUSH|http://redis.io/commands/lpush> command.
+
+Adds items to the beginning of a list, analogous to the Perl C<unshift> operator. 
+Takes the list name and a list of items to add. Returns the length of the list 
+when done.
+
+    my $new_length = $client->lpush( my_list => 1, 2, 3 );
+
+=head2 lpop
+
+Redis L<LPOP|http://redis.io/commands/lpop> command.
+
+Removes and returns the first element of a list, analogous to the Perl C<shift>
+operator. 
+
+    my $first = $client->lpop( 'my_list' );
+
+=head1 HASH METHODS
+
 =head2 hdel
+
+Redis L<HDEL|http://redis.io/commands/hdel> command.
 
 Deletes keys from a hash. Takes the name of a hash and a list of key names to delete. 
 Returns the number of keys deleted. Returns zero if the hash does not exist, or if
@@ -334,15 +618,19 @@ none of the keys specified exist in the hash.
 
 =head2 hexists
 
+Redis L<HEXISTS|http://redis.io/commands/hexists> command.
+
 Returns a true value if a key exists in a hash. Takes a hash name and the key name.
 
     blah() if $client->hexists( 'myhash', 'foo' );
 
 =head2 hget
 
+Redis L<HGET|http://redis.io/commands/hget> command.
+
 Retrieves a value associated with a key in a hash. Takes the name of the hash
 and the key within the hash. Returns C<undef> if the hash or the key within the
-hash does not exist. (Use L<exists> to determine if a key exists at all.)
+hash does not exist. (Use L</hexists> to determine if a key exists at all.)
 
     # sets the value for 'key' in the hash 'foo'
     $client->hset( 'foo', key => 42 );
@@ -351,6 +639,8 @@ hash does not exist. (Use L<exists> to determine if a key exists at all.)
 
 =head2 hgetall
 
+Redis L<HGETALL|http://redis.io/commands/hgetall> command.
+
 Retrieves all of the keys and values in a hash. Takes the name of the hash
 and returns a list of key/value pairs. 
 
@@ -358,12 +648,24 @@ and returns a list of key/value pairs.
 
 =head2 hkeys
 
+Redis L<HKEYS|http://redis.io/commands/hkeys> command.
+
 Retrieves a list of all the keys in a hash. Takes the name of the hash and
 returns a list of keys.
 
     my @keys = $client->hkeys( 'myhash' );
 
+=head2 hlen
+
+Redis L<HLEN|http://redis.io/commands/hlen> command.
+
+Retrieves the number of keys in a hash. Takes the name of the hash.
+
+    my $size = $client->hlen( 'myhash' );
+
 =head2 hmget
+
+Redis L<HMGET|http://redis.io/commands/hmget> command.
 
 Retrieves a list of values associated with the given keys in a hash. Takes
 the name of the hash and a list of keys. If a given key does not exist, 
@@ -373,6 +675,8 @@ C<undef> will be returned in the corresponding location in the result list.
 
 =head2 hmset
 
+Redis L<HMSET|http://redis.io/commands/hmset> command.
+
 Sets a list of key/value pairs in a hash. Takes the hash name and a list of
 keys and values to set. 
 
@@ -380,17 +684,25 @@ keys and values to set.
 
 =head2 hvals
 
+Redis L<HVALS|http://redis.io/commands/hvals> command.
+
 Retrieves a list of all the values in a given hash. Takes the hash name.
 
     my @values = $client->hvals( 'myhash' );
 
+=head1 SET METHODS
+
 =head2 sadd
+
+Redis L<SADD|http://redis.io/commands/sadd> command.
 
 Adds members to a set. Takes the names of the set and the members to add.
 
     $client->sadd( 'myset', 'foo', 'bar', 'baz' );
 
 =head2 srem
+
+Redis L<SREM|http://redis.io/commands/srem> command.
 
 Removes members from a set. Takes the names of the set and the members
 to remove.
@@ -399,6 +711,8 @@ to remove.
 
 =head2 smembers
 
+Redis L<SMEMBERS|http://redis.io/commands/smembers> command.
+
 Returns a list of all members in a set, in no particular order. Takes
 the name of the set.
 
@@ -406,12 +720,18 @@ the name of the set.
 
 =head2 sismember
 
+Redis L<SISMEMBER|http://redis.io/commands/sismember> command.
+
 Returns a true value if the given member is in a set. Takes the names
 of the set and the member.
 
     if ( $client->sismember( 'myset', foo' ) ) { ... }
 
+=head1 SORTED SET METHODS
+
 =head2 zadd
+
+Redis L<ZADD|http://redis.io/commands/zadd> command.
 
 Adds members to a sorted set (zset). Takes the sorted set name and a list of
 score/member pairs. 
@@ -423,11 +743,15 @@ of zsets as rough analogs of hashes. That's just how Redis does it.)
 
 =head2 zcard
 
+Redis L<ZCARD|http://redis.io/commands/zcard> command.
+
 Returns the cardinality (size) of a sorted set. Takes the name of the sorted set.
 
     my $size = $client->zcard( 'myzset' );
 
 =head2 zcount
+
+Redis L<ZCOUNT|http://redis.io/commands/zcount> command.
 
 Returns the number of members in a sorted set with scores between two values.
 Takes the name of the sorted set and the minimum and maximum
@@ -436,6 +760,8 @@ Takes the name of the sorted set and the minimum and maximum
 
 =head2 zrange
 
+Redis L<ZRANGE|http://redis.io/commands/zrange> command.
+
 Returns all the members of a sorted set with scores between two values. Takes the
 name of the sorted set, a minimum and maximum, and an optional boolean to 
 control whether or not the scores are returned along with the members.
@@ -443,21 +769,43 @@ control whether or not the scores are returned along with the members.
     my @members = $client->zrange( 'myzset', $min, $max );
     my %members_scores = $client->zrange( 'myzset', $min, $max, 1 );
 
-=head2 zrank
+=head2 zrank  
+
+Redis L<ZRANK|http://redis.io/commands/zrank> command.
 
 Returns the index of a member within a sorted. set. Takes the names of the
 sorted set and the member.
 
     my $rank = $client->zrank( 'myzset', 'foo' );
 
-=head2 zscore 
+=head2 zscore  
+
+Redis L<ZSCORE|http://redis.io/commands/zscore> command.
 
 Returns the score associated with a member in a sorted set. Takes the names
 of the sorted set and the member.
 
     my $score = $client->zscore( 'myzset', 'foo' );
 
+=head1 CONNECTION METHODS
+
+=head2 echo
+
+Redis L<ECHO|http://redis.io/commands/echo> command.
+
+Returns whatever you send it. Useful for testing only. Takes one argument.
+
+    print $client->echo( "Hello, World!" );
+
 =encoding utf8
+
+=str_methdod getbit
+
+Returns the value of one bit in a string. Takes the key name and the offset of
+the bit. If the offset is beyond the length of the string, C<0> is returned.
+If the key is not a string, a fatal error is thrown.
+
+    my $bit = $client->getbit( 'my_key', 4 );    # fifth bit from left
 
 =head1 CAVEATS
 
@@ -465,6 +813,26 @@ This early release is not feature-complete. I've implemented all the Redis
 commands that I use, but there are several that are not yet implemented. There
 is also no support for Redis publish/subscribe, but I intend to add that
 soon. Patches welcome. :)
+
+The L<MONITOR|http://redis.io/commands/monitor> command will probably not be
+supported any time soon since it would require some kind of asynchronous 
+solution and does not use the URP.
+
+=head1 EXTENDS
+
+=over 4
+
+=item * L<Moose::Object>
+
+=back
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<Redis::Client::Role::URP>
+
+=back
 
 =head1 AUTHOR
 

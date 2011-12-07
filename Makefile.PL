@@ -12,7 +12,6 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Perl client for Redis 2.4 and up",
   "AUTHOR" => "Mike Friedman <friedo\@friedo.com>",
   "BUILD_REQUIRES" => {
-    "Data::Dumper" => 0,
     "Encode" => 0,
     "Module::Build" => "0.3601",
     "Test::More" => 0,
@@ -29,15 +28,17 @@ my %WriteMakefileArgs = (
   "NAME" => "Redis::Client",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Data::Dumper" => 0,
     "IO::Socket::INET" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
     "Scalar::Util" => 0,
+    "aliased" => 0,
     "namespace::sweep" => "0.003",
     "overload" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }

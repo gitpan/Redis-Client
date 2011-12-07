@@ -7,7 +7,6 @@ use Module::Build 0.3601;
 
 my %module_build_args = (
   "build_requires" => {
-    "Data::Dumper" => 0,
     "Encode" => 0,
     "Module::Build" => "0.3601",
     "Test::More" => 0,
@@ -23,17 +22,19 @@ my %module_build_args = (
     "Mike Friedman <friedo\@friedo.com>"
   ],
   "dist_name" => "Redis-Client",
-  "dist_version" => "0.002",
+  "dist_version" => "0.009",
   "license" => "perl",
   "module_name" => "Redis::Client",
   "recommends" => {},
   "recursive_test_files" => 1,
   "requires" => {
     "Carp" => 0,
+    "Data::Dumper" => 0,
     "IO::Socket::INET" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
     "Scalar::Util" => 0,
+    "aliased" => 0,
     "namespace::sweep" => "0.003",
     "overload" => 0,
     "utf8" => 0

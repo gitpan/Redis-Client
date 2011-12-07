@@ -1,6 +1,6 @@
 package Redis::Client::Hash;
 {
-  $Redis::Client::Hash::VERSION = '0.002';
+  $Redis::Client::Hash::VERSION = '0.009';
 }
 
 # ABSTRACT: Work with Redis hashes
@@ -90,7 +90,7 @@ Redis::Client::Hash - Work with Redis hashes
 
 =head1 VERSION
 
-version 0.002
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -157,6 +157,22 @@ Iterate over key/value pairs from the hash.
 =over
 
 =item L<Redis::Client>
+
+=back
+
+=head1 EXTENDS
+
+=over 4
+
+=item * L<Moose::Object>
+
+=back
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<Redis::Client::Role::Tied>
 
 =back
 

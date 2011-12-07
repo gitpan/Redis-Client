@@ -1,6 +1,6 @@
 package Redis::Client::List;
 {
-  $Redis::Client::List::VERSION = '0.002';
+  $Redis::Client::List::VERSION = '0.009';
 }
 
 # ABSTRACT: Work with Redis lists
@@ -103,7 +103,7 @@ Redis::Client::List - Work with Redis lists
 
 =head1 VERSION
 
-version 0.002
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -184,6 +184,22 @@ The C<splice> operator is not yet supported for Redis lists.
 =over
 
 =item L<Redis::Client>
+
+=back
+
+=head1 EXTENDS
+
+=over 4
+
+=item * L<Moose::Object>
+
+=back
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<Redis::Client::Role::Tied>
 
 =back
 

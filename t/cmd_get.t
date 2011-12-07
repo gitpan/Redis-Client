@@ -2,34 +2,35 @@
 
 use strict;
 use warnings;
-
+use utf8;
 use lib 't';
 
-use Test::More tests => 8;
+use Test::More;
+
+# ABSTRACT: Tests for the Redis GET command.
 
 use_ok 'RedisClientTest';
 
-SKIP: { 
-    my $redis = RedisClientTest->server;
-    
-    skip 'No Redis server available', 7 unless $redis;
-    
-    ok $redis;
-    isa_ok $redis, 'Redis::Client';
+my $redis = RedisClientTest->server;
+done_testing && exit unless $redis;
 
-    $redis->set( redis_client_test_foo => 'foobar' );
+isa_ok $redis, 'Redis::Client';
 
-    my $res = $redis->get( 'redis_client_test_foo' );
-    is $res, 'foobar';
+$redis->set( perl_redis_test_get => 'foobar' );
 
-    ok $redis->del( 'redis_client_test_foo' );
+my $val = $redis->get( 'perl_redis_test_get' );
 
-    my $res2 = $redis->get( 'redis_client_test_not_exist' );
-    ok !defined( $res2 );
+is $val, 'foobar';
 
-    $redis->rpush( 'redis_client_test_list', 42 );
-    my $res3 = eval { $redis->get( 'redis_client_test_list' ) };
-    ok $@;
-    like $@, qr/Operation against a key holding the wrong kind of value/;
-}
+ok $redis->del( 'perl_redis_test_get' );
+
+$redis->lpush( perl_redis_test_list => 1 );
+
+eval { $redis->get( 'perl_redis_test_list' ) };
+
+like $@, qr/wrong kind of value/;
+
+ok $redis->del( 'perl_redis_test_list' );
+
+done_testing;
 
