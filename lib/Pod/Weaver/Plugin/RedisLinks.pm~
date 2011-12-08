@@ -1,0 +1,20 @@
+package Pod::Weaver::Plugin::RedisLinks
+
+# ABSTRACT: Add links to Redis documentation
+
+use Moose;
+with 'Pod::Weaver::Role::Section';
+
+
+sub weave_section { 
+    my ( $self, $doc, $input ) = @_;
+
+    warn sprintf 'doc = [%s]', $doc;
+    warn sprintf 'inp = [%s]', $input;
+}
+
+1;
+
+
+__END__
+

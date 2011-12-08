@@ -6,15 +6,22 @@ META.yml
 Makefile.PL
 README
 dist.ini
+dump.rdb
+gentest.pl
+gentest.pl~
 lib/Pod/Weaver/Plugin/RedisLinks.pm
+lib/Pod/Weaver/Plugin/RedisLinks.pm~
 lib/Redis/Client.pm
 lib/Redis/Client/Hash.pm
 lib/Redis/Client/List.pm
 lib/Redis/Client/Role/Tied.pm
 lib/Redis/Client/Role/URP.pm
+lib/Redis/Client/Role/URP.pm~
 lib/Redis/Client/Set.pm
 lib/Redis/Client/String.pm
 lib/Redis/Client/Zset.pm
+pod2htmd.tmp
+pod2htmi.tmp
 t/RedisClientTest.pm
 t/cmd_append.t
 t/cmd_auth.t
@@ -136,3 +143,4 @@ t/string.t
 t/utf8.t
 t/zset.t
 weaver.ini
+weaver.ini~

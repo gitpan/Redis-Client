@@ -1,6 +1,6 @@
 package Pod::Weaver::Plugin::RedisLinks;
 {
-  $Pod::Weaver::Plugin::RedisLinks::VERSION = '0.009';
+  $Pod::Weaver::Plugin::RedisLinks::VERSION = '0.010';
 }
 
 # ABSTRACT: Add links to Redis documentation
@@ -57,7 +57,7 @@ Pod::Weaver::Plugin::RedisLinks - Add links to Redis documentation
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 
@@ -79,6 +79,8 @@ to the official L<Redis|http://redis.io/> documentation for each command.
 =item * L<Pod::Weaver::Role::Transformer>
 
 =item * L<Pod::Weaver::Role::Plugin>
+
+=item * L<Pod::Weaver::Role::Section>
 
 =back
 

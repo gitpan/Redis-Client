@@ -1,6 +1,6 @@
 package Redis::Client::Hash;
 {
-  $Redis::Client::Hash::VERSION = '0.009';
+  $Redis::Client::Hash::VERSION = '0.010';
 }
 
 # ABSTRACT: Work with Redis hashes
@@ -90,7 +90,7 @@ Redis::Client::Hash - Work with Redis hashes
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

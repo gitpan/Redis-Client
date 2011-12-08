@@ -1,6 +1,6 @@
 package Redis::Client::String;
 {
-  $Redis::Client::String::VERSION = '0.009';
+  $Redis::Client::String::VERSION = '0.010';
 }
 
 # ABSTRACT: Work with Redis strings
@@ -63,7 +63,7 @@ Redis::Client::String - Work with Redis strings
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

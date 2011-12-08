@@ -1,6 +1,6 @@
 package Redis::Client::Role::URP;
 {
-  $Redis::Client::Role::URP::VERSION = '0.009';
+  $Redis::Client::Role::URP::VERSION = '0.010';
 }
 
 # ABSTRACT: Role for the Redis Unified Request Protocol
@@ -154,7 +154,7 @@ Redis::Client::Role::URP - Role for the Redis Unified Request Protocol
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -170,22 +170,16 @@ version 0.009
 This role implements the L<Unified Request Protocol|http://redis.io/topics/protocol> used by 
 Redis 2.0 and above.
 
-=encoding utf8
+=head1 METHODS
 
-=method send_command
+=head2 send_command
 
 Sends a command to Redis using the URP and returns the response. Takes the name of
 the command and a list of arguments. 
 
     $self->send_command( 'DEL', 'key1', 'key2', 'key3' );
 
-=head1 CONSUMES
-
-=over 4
-
-=item * L<Redis::Client::Role::URP>
-
-=back
+=encoding utf8
 
 =head1 AUTHOR
 

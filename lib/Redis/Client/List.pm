@@ -1,6 +1,6 @@
 package Redis::Client::List;
 {
-  $Redis::Client::List::VERSION = '0.009';
+  $Redis::Client::List::VERSION = '0.010';
 }
 
 # ABSTRACT: Work with Redis lists
@@ -103,7 +103,7 @@ Redis::Client::List - Work with Redis lists
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
