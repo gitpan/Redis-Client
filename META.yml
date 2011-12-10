@@ -31,4 +31,4 @@ requires:
   utf8: 0
 resources:
   repository: git://github.com/friedo/perl-redis-client.git
-version: 0.010
+version: 0.011
