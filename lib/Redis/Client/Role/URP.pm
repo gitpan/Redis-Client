@@ -1,6 +1,6 @@
 package Redis::Client::Role::URP;
 {
-  $Redis::Client::Role::URP::VERSION = '0.011';
+  $Redis::Client::Role::URP::VERSION = '0.012';
 }
 
 # ABSTRACT: Role for the Redis Unified Request Protocol
@@ -154,7 +154,7 @@ Redis::Client::Role::URP - Role for the Redis Unified Request Protocol
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -180,6 +180,14 @@ the command and a list of arguments.
     $self->send_command( 'DEL', 'key1', 'key2', 'key3' );
 
 =encoding utf8
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<Redis::Client::Role::URP>
+
+=back
 
 =head1 AUTHOR
 

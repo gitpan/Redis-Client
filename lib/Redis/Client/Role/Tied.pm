@@ -1,6 +1,6 @@
 package Redis::Client::Role::Tied;
 {
-  $Redis::Client::Role::Tied::VERSION = '0.011';
+  $Redis::Client::Role::Tied::VERSION = '0.012';
 }
 
 # ABSTRACT: Role for tied things that talk to Redis
@@ -43,7 +43,7 @@ Redis::Client::Role::Tied - Role for tied things that talk to Redis
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 DESCRIPTION
 
@@ -66,6 +66,14 @@ This role contains common functionality used by the Redis::Client C<tie> classes
 =item L<Redis::Client::Set>
 
 =item L<Redis::Client::Zset>
+
+=back
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<Redis::Client::Role::Tied>
 
 =back
 

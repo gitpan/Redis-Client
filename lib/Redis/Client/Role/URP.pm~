@@ -1,6 +1,0 @@
-package Redis::Client::Role::URP;
-
-# ABSTRACT: Role for the Redis Unified Request Protocol
-
-use Moose::Role;
-
