@@ -7,7 +7,7 @@ use lib 't';
 
 use Test::More;
 
-# ABSTRACT: Tests for the Redis EXPITEAT command.
+# ABSTRACT: Tests for the Redis EXPIREAT command.
 
 use_ok 'RedisClientTest';
 

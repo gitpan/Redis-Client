@@ -22,7 +22,7 @@ my %module_build_args = (
     "Mike Friedman <friedo\@friedo.com>"
   ],
   "dist_name" => "Redis-Client",
-  "dist_version" => "0.012",
+  "dist_version" => "0.013",
   "license" => "perl",
   "module_name" => "Redis::Client",
   "recommends" => {},

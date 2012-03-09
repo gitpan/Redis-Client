@@ -1,6 +1,6 @@
 package Redis::Client;
 {
-  $Redis::Client::VERSION = '0.012';
+  $Redis::Client::VERSION = '0.013';
 }
 
 use Moose;
@@ -24,7 +24,7 @@ BEGIN {
         DEL         => [ 1, undef ],
         EXISTS      => 1,
         EXPIRE      => 2,
-        EXPITEAT    => 2,
+        EXPIREAT    => 2,
         KEYS        => 1,
         MOVE        => 2,
         OBJECT      => [ 1, undef ],
@@ -216,7 +216,7 @@ Redis::Client - Perl client for Redis 2.4 and up
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Redis::Client::Role::URP;
 {
-  $Redis::Client::Role::URP::VERSION = '0.012';
+  $Redis::Client::Role::URP::VERSION = '0.013';
 }
 
 # ABSTRACT: Role for the Redis Unified Request Protocol
@@ -154,7 +154,7 @@ Redis::Client::Role::URP - Role for the Redis Unified Request Protocol
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
