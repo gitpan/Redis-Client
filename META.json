@@ -4,7 +4,7 @@
       "Mike Friedman <friedo@friedo.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "perl_5"
    ],
@@ -27,24 +27,24 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : 0,
-            "Data::Dumper" : 0,
-            "IO::Socket::INET" : 0,
-            "Moose" : 0,
-            "Moose::Role" : 0,
-            "Scalar::Util" : 0,
-            "aliased" : 0,
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "IO::Socket::INET" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Scalar::Util" : "0",
+            "aliased" : "0",
             "namespace::sweep" : "0.003",
-            "overload" : 0,
-            "utf8" : 0
+            "overload" : "0",
+            "utf8" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Encode" : 0,
-            "Test::More" : 0,
-            "strict" : 0,
-            "warnings" : 0
+            "Encode" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
@@ -53,9 +53,9 @@
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/friedo/perl-redis-client.git",
-         "web" : "http://github.com/friedo/perl-redis-client"
+         "web" : "https://github.com/friedo/perl-redis-client"
       }
    },
-   "version" : "0.013"
+   "version" : "0.014"
 }
 

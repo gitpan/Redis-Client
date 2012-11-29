@@ -1,6 +1,6 @@
 package Pod::Weaver::Plugin::RedisLinks;
 {
-  $Pod::Weaver::Plugin::RedisLinks::VERSION = '0.013';
+  $Pod::Weaver::Plugin::RedisLinks::VERSION = '0.014';
 }
 
 # ABSTRACT: Add links to Redis documentation
@@ -46,8 +46,7 @@ __PACKAGE__->meta->make_immutable;
 
 1;
 
-
-
+__END__
 
 =pod
 
@@ -57,7 +56,7 @@ Pod::Weaver::Plugin::RedisLinks - Add links to Redis documentation
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 DESCRIPTION
 
@@ -94,8 +93,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-
-

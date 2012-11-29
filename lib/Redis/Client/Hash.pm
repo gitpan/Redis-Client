@@ -1,6 +1,6 @@
 package Redis::Client::Hash;
 {
-  $Redis::Client::Hash::VERSION = '0.013';
+  $Redis::Client::Hash::VERSION = '0.014';
 }
 
 # ABSTRACT: Work with Redis hashes
@@ -79,8 +79,7 @@ sub NEXTKEY {
 
 __PACKAGE__->meta->make_immutable;
 
-
-
+__END__
 
 =pod
 
@@ -90,7 +89,7 @@ Redis::Client::Hash - Work with Redis hashes
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -188,10 +187,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-
-
-
-

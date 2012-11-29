@@ -6,7 +6,6 @@ META.yml
 Makefile.PL
 README
 dist.ini
-fix_expireat.patch
 lib/Pod/Weaver/Plugin/RedisLinks.pm
 lib/Redis/Client.pm
 lib/Redis/Client/Hash.pm
@@ -16,7 +15,6 @@ lib/Redis/Client/Role/URP.pm
 lib/Redis/Client/Set.pm
 lib/Redis/Client/String.pm
 lib/Redis/Client/Zset.pm
-narf.pl
 t/RedisClientTest.pm
 t/cmd_append.t
 t/cmd_auth.t
@@ -39,6 +37,7 @@ t/cmd_eval.t
 t/cmd_exists.t
 t/cmd_expire.t
 t/cmd_expireat.t
+t/cmd_expiteat.t
 t/cmd_flushall.t
 t/cmd_flushdb.t
 t/cmd_get.t

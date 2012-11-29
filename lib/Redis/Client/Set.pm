@@ -1,6 +1,6 @@
 package Redis::Client::Set;
 {
-  $Redis::Client::Set::VERSION = '0.013';
+  $Redis::Client::Set::VERSION = '0.014';
 }
 
 # ABSTRACT: Work with Redis sets
@@ -73,8 +73,7 @@ __PACKAGE__->meta->make_immutable;
 
 1;
 
-
-
+__END__
 
 =pod
 
@@ -84,7 +83,7 @@ Redis::Client::Set - Work with Redis sets
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -189,7 +188,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

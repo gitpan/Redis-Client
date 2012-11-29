@@ -1,6 +1,6 @@
 package Redis::Client;
 {
-  $Redis::Client::VERSION = '0.013';
+  $Redis::Client::VERSION = '0.014';
 }
 
 use Moose;
@@ -206,7 +206,7 @@ __PACKAGE__->meta->make_immutable;
 
 1;
 
-
+__END__
 
 =pod
 
@@ -216,7 +216,7 @@ Redis::Client - Perl client for Redis 2.4 and up
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -871,10 +871,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-
-
-
-

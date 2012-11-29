@@ -1,6 +1,6 @@
 package Redis::Client::Role::Tied;
 {
-  $Redis::Client::Role::Tied::VERSION = '0.013';
+  $Redis::Client::Role::Tied::VERSION = '0.014';
 }
 
 # ABSTRACT: Role for tied things that talk to Redis
@@ -32,8 +32,7 @@ sub _cmd {
 
 1;
 
-
-
+__END__
 
 =pod
 
@@ -43,7 +42,7 @@ Redis::Client::Role::Tied - Role for tied things that talk to Redis
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 DESCRIPTION
 
@@ -69,14 +68,6 @@ This role contains common functionality used by the Redis::Client C<tie> classes
 
 =back
 
-=head1 CONSUMES
-
-=over 4
-
-=item * L<Redis::Client::Role::Tied>
-
-=back
-
 =head1 AUTHOR
 
 Mike Friedman <friedo@friedo.com>
@@ -89,10 +80,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-
-
-
-

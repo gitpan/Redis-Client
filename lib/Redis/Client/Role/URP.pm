@@ -1,6 +1,6 @@
 package Redis::Client::Role::URP;
 {
-  $Redis::Client::Role::URP::VERSION = '0.013';
+  $Redis::Client::Role::URP::VERSION = '0.014';
 }
 
 # ABSTRACT: Role for the Redis Unified Request Protocol
@@ -12,7 +12,7 @@ our @CARP_NOT = ( 'Redis::Client' );     # report errors from the right place
 
 my $CRLF = "\x0D\x0A";
 
-has '_sock'        => ( is => 'ro', isa => 'IO::Socket', init_arg => undef, lazy_build => 1, 
+has '_sock'        => ( is => 'rw', isa => 'IO::Socket', init_arg => undef, lazy_build => 1, 
                         predicate => '_have_sock', clearer => '_clear_sock' );
 
 requires 'host';
@@ -81,6 +81,10 @@ sub _get_response {
         # A Redis error. Get the error message and throw it.
         my $err = $self->$meth;
         $err =~ s/ERR\s/Redis: /;
+
+        # Reconnect to server so next command does not fail
+        $self->_sock( $self->_build__sock );
+
         croak $err;
     }
 
@@ -143,8 +147,7 @@ sub _read_single_line {
 
 1;
 
-
-
+__END__
 
 =pod
 
@@ -154,7 +157,7 @@ Redis::Client::Role::URP - Role for the Redis Unified Request Protocol
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -181,14 +184,6 @@ the command and a list of arguments.
 
 =encoding utf8
 
-=head1 CONSUMES
-
-=over 4
-
-=item * L<Redis::Client::Role::URP>
-
-=back
-
 =head1 AUTHOR
 
 Mike Friedman <friedo@friedo.com>
@@ -201,8 +196,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-
-
