@@ -1,8 +1,5 @@
 package Redis::Client::Hash;
-{
-  $Redis::Client::Hash::VERSION = '0.014';
-}
-
+$Redis::Client::Hash::VERSION = '0.015';
 # ABSTRACT: Work with Redis hashes
 
 use Moose;
@@ -89,7 +86,7 @@ Redis::Client::Hash - Work with Redis hashes
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

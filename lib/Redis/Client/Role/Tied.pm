@@ -1,8 +1,5 @@
 package Redis::Client::Role::Tied;
-{
-  $Redis::Client::Role::Tied::VERSION = '0.014';
-}
-
+$Redis::Client::Role::Tied::VERSION = '0.015';
 # ABSTRACT: Role for tied things that talk to Redis
 
 use Moose::Role;
@@ -42,7 +39,7 @@ Redis::Client::Role::Tied - Role for tied things that talk to Redis
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 DESCRIPTION
 

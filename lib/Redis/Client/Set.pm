@@ -1,8 +1,5 @@
 package Redis::Client::Set;
-{
-  $Redis::Client::Set::VERSION = '0.014';
-}
-
+$Redis::Client::Set::VERSION = '0.015';
 # ABSTRACT: Work with Redis sets
 
 use Moose;
@@ -83,7 +80,7 @@ Redis::Client::Set - Work with Redis sets
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

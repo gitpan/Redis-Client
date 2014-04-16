@@ -1,8 +1,5 @@
 package Redis::Client;
-{
-  $Redis::Client::VERSION = '0.014';
-}
-
+$Redis::Client::VERSION = '0.015';
 use Moose;
 use IO::Socket::INET ();
 use Carp 'croak';
@@ -82,6 +79,7 @@ BEGIN {
         HGET        => 2,
         HGETALL     => 1,
         HINCRBY     => 3,
+        HINCRBYFLOAT    => 3,
         HKEYS       => 1,
         HLEN        => 1,
         HMGET       => [ 2, undef ],
@@ -216,7 +214,7 @@ Redis::Client - Perl client for Redis 2.4 and up
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

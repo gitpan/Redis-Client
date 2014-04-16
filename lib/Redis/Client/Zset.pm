@@ -1,8 +1,5 @@
 package Redis::Client::Zset;
-{
-  $Redis::Client::Zset::VERSION = '0.014';
-}
-
+$Redis::Client::Zset::VERSION = '0.015';
 # ABSTRACT: Work with Redis ordered sets (zsets)
 
 use Moose;
@@ -88,7 +85,7 @@ Redis::Client::Zset - Work with Redis ordered sets (zsets)
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

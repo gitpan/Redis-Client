@@ -1,8 +1,5 @@
 package Redis::Client::Role::URP;
-{
-  $Redis::Client::Role::URP::VERSION = '0.014';
-}
-
+$Redis::Client::Role::URP::VERSION = '0.015';
 # ABSTRACT: Role for the Redis Unified Request Protocol
 
 use Moose::Role;
@@ -35,7 +32,9 @@ sub send_command {
     my ( $cmd, @args ) = @_;
 
     my $sock = $self->_sock;
-    my $cmd_block = $self->_build_urp( $cmd, @args );
+    my @cmd = ();
+    ($cmd =~ /\s/) ? (@cmd = split(/\s/, $cmd)) : (@cmd = ($cmd));
+    my $cmd_block = $self->_build_urp( @cmd, @args );
 
     $sock->send( $cmd_block );
 
@@ -157,7 +156,7 @@ Redis::Client::Role::URP - Role for the Redis Unified Request Protocol
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

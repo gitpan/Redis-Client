@@ -4,7 +4,7 @@
       "Mike Friedman <friedo@friedo.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.133380",
    "license" : [
       "perl_5"
    ],
@@ -43,6 +43,7 @@
          "requires" : {
             "Encode" : "0",
             "Test::More" : "0",
+            "lib" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -56,6 +57,6 @@
          "web" : "https://github.com/friedo/perl-redis-client"
       }
    },
-   "version" : "0.014"
+   "version" : "0.015"
 }
 
